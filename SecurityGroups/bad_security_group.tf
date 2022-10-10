@@ -1,5 +1,5 @@
-resource "aws_security_group" "server_access" {
-  name        = "server-access-sg"
+resource "aws_security_group" "linux_server_access" {
+  name        = "linux-server-access-sg"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -8,6 +8,13 @@ resource "aws_security_group" "server_access" {
     to_port          = 443
     protocol         = "tcp"
     cidr_blocks      = ["10.0.0.0/8"]
+  }
+
+  ingress {
+    description = "Allow pings"
+    from_port = "-1"
+    to_port = "-1"
+    protocol = "tcp"
   }
 
   ingress {
