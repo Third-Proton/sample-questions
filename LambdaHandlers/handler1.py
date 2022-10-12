@@ -1,13 +1,22 @@
-import requests
+import json
+from mylib import process_record
 
 def handler(event, context):
-    r = requests.get(
-        'https://my.url/api/user',
-        params={'email': event['body']['email']}
-    )
-    r.raise_for_status()
+    status_code = 200
+    results = []
+    for record in event['Records']:
+        try:
+            data = json.loads(record['body'])
+            result = process_record(data)
+            results.append(result)
+        except Exception as e:
+            results.append({
+                'record_id': record['id'],
+                'error': str(e)
+            })
+            status_code = 500
 
-    return r.json()
-
-if __name__ == '__main__':
-    handler({'body': {'email': 'test@example.com'}}, None)
+    return {
+        'statusCode': status_code,
+        'body': json.dumps(results)
+    }
